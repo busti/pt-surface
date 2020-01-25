@@ -12,7 +12,7 @@ function second_stage() {
 	set -e
 	apt install -y git
 	
-	mkdir /root/bootstrap
+	mkdir -p /root/bootstrap
 	( cd /root/bootstrap;
 		sudo apt install -y build-essential binutils-dev libncurses5-dev libssl-dev ccache bison flex libelf-dev
 		git clone --depth 1 https://github.com/linux-surface/linux-surface linux-surface/
