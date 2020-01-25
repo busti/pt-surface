@@ -10,7 +10,7 @@ function first_stage() {
 
 function second_stage() {
 	set -e
-	apt install-git
+	apt install git
 	
 	mkdir /root/bootstrap
 	( cd /root/bootstrap;
