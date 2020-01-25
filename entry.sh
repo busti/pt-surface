@@ -1,10 +1,17 @@
 #!/bin/bash
 
-linux_version_major = "4.19"
-linux_version_minor = "98"
-linux_version = "v${linux_version_major}${linux_version_minor}"
+linux_version_major="4.19"
+linux_version_minor="98"
+linux_version="v${linux_version_major}${linux_version_minor}"
+
+function first_stage() {
+	
+}
 
 function second_stage() {
+	set -e
+	apt install-git
+	
 	mkdir /root/bootstrap
 	( cd /root/bootstrap;
 		sudo apt install build-essential binutils-dev libncurses5-dev libssl-dev ccache bison flex libelf-dev
