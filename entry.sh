@@ -5,7 +5,7 @@ linux_version_minor="98"
 linux_version="v${linux_version_major}${linux_version_minor}"
 
 function first_stage() {
-	
+	echo "Hello, World!" #Its tradition
 }
 
 function second_stage() {
