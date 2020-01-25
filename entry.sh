@@ -14,7 +14,7 @@ function second_stage() {
 	
 	mkdir -p /root/bootstrap
 	( cd /root/bootstrap;
-		sudo apt install -y build-essential binutils-dev libncurses5-dev libssl-dev ccache bison flex libelf-dev
+		apt install -y build-essential binutils-dev libncurses5-dev libssl-dev ccache bison flex libelf-dev
 		git clone --depth 1 https://github.com/linux-surface/linux-surface linux-surface/
 		git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git linux-kernel/
 		git clone https://github.com/linux-surface/linux-surface-kernel-configs kernel-configs/
