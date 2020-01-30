@@ -27,6 +27,8 @@ function first_stage() {
     cryptsetup luksClose cryptlvm
   fi
 
+  lsblk
+
   echo "deleting old linux partitions if present"
   (
     echo d   # delete a partition
@@ -35,6 +37,8 @@ function first_stage() {
     echo 6   # partition number   => 6
     echo w   # write changes to disk
   )
+
+  lsblk
 
   echo "partitioning disk"
   (
