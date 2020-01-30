@@ -27,14 +27,14 @@ function first_stage() {
     cryptsetup luksClose cryptlvm
   fi
 
-  #echo "deleting old linux partitions if present"
-  #(
-  #  echo d   # delete a partition
-  #  echo 5   # partition number   => 5
-  #  echo d   # delete a partition
-  #  echo 6   # partition number   => 6
-  #  echo w   # write changes to disk
-  #)
+  echo "deleting old linux partitions if present"
+  (
+    echo d   # delete a partition
+    echo 5   # partition number   => 5
+    echo d   # delete a partition
+    echo 6   # partition number   => 6
+    echo w   # write changes to disk
+  )
 
   echo "partitioning disk"
   (
