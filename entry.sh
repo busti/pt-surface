@@ -93,11 +93,11 @@ function second_stage() {
 
       echo "copying root files from linux-surface"
       for dir in $(ls root/); do
-        sudo cp -Rbv "root/$dir/"* "/$dir/"
+        cp -Rbv "root/$dir/"* "/$dir/"
       done
 
       echo "copying firmware from linux-surface"
-      sudo cp -rv firmware/* /lib/firmware/
+      cp -rv firmware/* /lib/firmware/
     )
 
     echo "installing kernel build dependencies"
