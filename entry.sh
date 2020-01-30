@@ -85,10 +85,6 @@ function second_stage() {
   set -e
   apt install -y git
 
-  echo "switching systemclock to local time"
-  timedatectl set-local-rtc 1
-  sudo hwclock --systohc --localtime
-
   mkdir -p /root/bootstrap
   ( cd /root/bootstrap
     git clone --depth 1 https://github.com/linux-surface/linux-surface linux-surface/
