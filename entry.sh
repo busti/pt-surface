@@ -14,8 +14,10 @@ read -s LUKS_PASSWORD
 function first_stage() {
   set -e
 
+  echo "installing tool required for disk formatting"
   apt install -y cryptsetup btrfs-progs lvm2
 
+  echo "unmounting lvm image if present"
   if [ -d /dev/vg0 ]; then
     swapoff /dev/vg0/swap || true
     vgchange -an /dev/vg0
@@ -25,6 +27,7 @@ function first_stage() {
     cryptsetup luksClose cryptlvm
   fi
 
+  echo "partitioning disk"
   (
     echo n   # add a new partition         :  boot
     echo     # partition number            => count + 1
@@ -41,9 +44,11 @@ function first_stage() {
 
   lsblk
 
+  echo "generating filesystem"
   echo mkfs.ext4 ${DEVICE}${PART_BOOT}
   yes | mkfs.ext4 ${DEVICE}${PART_BOOT}
 
+  echo "setting up cryptlvm"
   (
     echo $LUKS_PASSWORD
     echo $LUKS_PASSWORD
@@ -61,6 +66,7 @@ function first_stage() {
   mkswap /dev/vg0/swap
   swapon /dev/vg0/swap
 
+  echo "mounting root directory to target"
   echo mount /dev/vg0/root $TARGET
   mount /dev/vg0/root $TARGET
 
@@ -79,23 +85,51 @@ function second_stage() {
   set -e
   apt install -y git
 
+  echo "switching systemclock to local time"
+  timedatectl set-local-rtc 1
+  sudo hwclock --systohc --localtime
+
   mkdir -p /root/bootstrap
-  (
-    cd /root/bootstrap
-    apt install -y build-essential binutils-dev libncurses5-dev libssl-dev ccache bison flex libelf-dev
+  ( cd /root/bootstrap
     git clone --depth 1 https://github.com/linux-surface/linux-surface linux-surface/
+
+    ( cd linux-surface/
+
+      echo "copying root files from linux-surface"
+      for dir in $(ls root/); do
+        sudo cp -Rbv "root/$dir/"* "/$dir/"
+      done
+
+      echo "copying firmware from linux-surface"
+      sudo cp -rv firmware/* /lib/firmware/
+    )
+
+    echo "installing kernel build dependencies"
+    apt install -y build-essential binutils-dev libncurses5-dev libssl-dev ccache bison flex libelf-dev
+
+    echo "cloning kernel repository"
     git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git linux-kernel/
+
+    echo "cloning kernel configs"
     git clone https://github.com/linux-surface/linux-surface-kernel-configs kernel-configs/
 
-    (
-      cd linux-kernel/
+    ( cd linux-kernel/
+
+      echo "checking out desired kernel version to custom branch"
       git checkout ${LINUX_VERSION}
       git switch -c ${LINUX_VERSION}-surface
+
+      echo "applying patches to kernel repo"
       for i in /root/bootstrap/linux-surface/patches/${LINUX_VERSION_MAJOR}/*.patch; do patch -p1 <$i; done
+
+      echo "copying kernel configs"
       cp kernel-configs/debian-${LINUX_VERSION_MAJOR}-x86_64.config/ .config
+
+      echo "compiling kernel"
       make -j $(getconf _NPROCESSORS_ONLN) deb-pkg LOCALVERSION=-linux-surface
     )
 
+    echo "installing kernel"
     dpkg -i linux*.deb
   )
 }
