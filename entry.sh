@@ -128,7 +128,7 @@ function second_stage() {
       for i in /root/bootstrap/linux-surface/patches/${LINUX_VERSION_MAJOR}/*.patch; do patch -p1 <$i; done
 
       echo "copying kernel configs"
-      cp kernel-configs/${LINUX_VERSION_MAJOR}/generated/ubuntu-${LINUX_VERSION_MAJOR}-x86_64.config/ .config
+      cp kernel-configs/${LINUX_VERSION_MAJOR}/generated/ubuntu-${LINUX_VERSION_MAJOR}-x86_64.config .config
 
       echo "compiling kernel"
       make -j $(getconf _NPROCESSORS_ONLN) deb-pkg LOCALVERSION=-linux-surface
