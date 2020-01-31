@@ -47,14 +47,14 @@ function first_stage() {
 
   echo "partitioning disk"
   (
-    echo n   # add a new partition         :  boot
-    echo     # partition number            => count + 1
-    echo     # first sector                => after last
-    echo +2G # last sector                 => 2GB size
-    echo n   # add a new partition         :  root
-    echo     # partition number            => count + 1
-    echo     # first sector                => after last
-    echo     # last sector                 => fill remaining space
+    echo n   # add a new partition :  boot
+    echo     # partition number    => count + 1
+    echo     # first sector        => after last
+    echo +2G # last sector         => 2GB size
+    echo n   # add a new partition :  root
+    echo     # partition number    => count + 1
+    echo     # first sector        => after last
+    echo     # last sector         => fill remaining space
     echo w   # write changes to disk
   ) | fdisk ${DEVICE}
 
