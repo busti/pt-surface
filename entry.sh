@@ -114,7 +114,7 @@ function second_stage() {
     )
 
     echo "installing kernel build dependencies"
-    apt install -y build-essential binutils-dev libncurses5-dev libssl-dev ccache bison flex libelf-dev
+    apt install -y build-essential binutils-dev libncurses5-dev libssl-dev ccache bison flex libelf-dev bc
 
     echo "cloning kernel repository"
     git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git linux-kernel/
