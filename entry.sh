@@ -51,12 +51,10 @@ function first_stage() {
     echo     # partition number            => count + 1
     echo     # first sector                => after last
     echo +2G # last sector                 => 2GB size
-    echo Y   # delete filesystem signature => [Y]es
     echo n   # add a new partition         :  root
     echo     # partition number            => count + 1
     echo     # first sector                => after last
     echo     # last sector                 => fill remaining space
-    echo Y   # delete filesystem signature => [Y]es
     echo w   # write changes to disk
   ) | fdisk ${DEVICE}
 
