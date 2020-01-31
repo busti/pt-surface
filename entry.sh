@@ -18,14 +18,19 @@ function first_stage() {
   apt install -y cryptsetup btrfs-progs lvm2
 
   echo "unmounting lvm image if present"
-  if [ -d /dev/vg0 ]; then
-    swapoff /dev/vg0/swap || true
-    vgchange -an /dev/vg0
-  fi
+	if [ -d /dev/vg0 ]; then
+		mount | grep target | awk '{print $3}'| sort -r | while read LINE; do
+			umount -l $LINE;
+		done
+		if [ -b /dev/vg0/swap ]; then
+			swapoff /dev/vg0/swap || true
+		fi
+		vgchange -an /dev/vg0
+	fi
 
-  if [ -b /dev/mapper/cryptlvm ]; then
-    cryptsetup luksClose cryptlvm
-  fi
+	if [ -b /dev/mapper/cryptlvm ]; then
+		cryptsetup luksClose cryptlvm
+	fi
 
   lsblk
 
