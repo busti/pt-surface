@@ -36,7 +36,7 @@ function first_stage() {
     echo d   # delete a partition
     echo 6   # partition number   => 6
     echo w   # write changes to disk
-  )
+  ) | fdisk ${DEVICE}
 
   lsblk
 
