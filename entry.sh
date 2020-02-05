@@ -8,8 +8,17 @@ LINUX_VERSION_MAJOR="4.19"
 LINUX_VERSION_MINOR="98"
 LINUX_VERSION="v${LINUX_VERSION_MAJOR}.${LINUX_VERSION_MINOR}"
 
-echo -n LUKS_PASSWORD:
-read -s LUKS_PASSWORD
+echo -n "luks password: "
+read -s luks_password_in
+export LUKS_PASSWORD=$luks_password_in
+
+echo -n "root password: "
+read -s root_password_in
+export ROOT_PASSWORD=$root_password_in
+
+echo -n "user password: "
+read -s user_password_in
+export USER_PASSWORD=$user_password_in
 
 function first_stage() {
   set -e
@@ -18,29 +27,29 @@ function first_stage() {
   apt install -y cryptsetup btrfs-progs lvm2
 
   echo "unmounting lvm image if present"
-	if [ -d /dev/vg0 ]; then
-		mount | grep target | awk '{print $3}'| sort -r | while read LINE; do
-			umount -l $LINE;
-		done
-		if [ -b /dev/vg0/swap ]; then
-			swapoff /dev/vg0/swap || true
-		fi
-		vgchange -an /dev/vg0
-	fi
+  if [ -d /dev/vg0 ]; then
+    mount | grep target | awk '{print $3}' | sort -r | while read LINE; do
+      umount -l $LINE
+    done
+    if [ -b /dev/vg0/swap ]; then
+      swapoff /dev/vg0/swap || true
+    fi
+    vgchange -an /dev/vg0
+  fi
 
-	if [ -b /dev/mapper/cryptlvm ]; then
-		cryptsetup luksClose cryptlvm
-	fi
+  if [ -b /dev/mapper/cryptlvm ]; then
+    cryptsetup luksClose cryptlvm
+  fi
 
   lsblk
 
   echo "deleting old linux partitions if present"
   (
-    echo d   # delete a partition
-    echo 5   # partition number   => 5
-    echo d   # delete a partition
-    echo 6   # partition number   => 6
-    echo w   # write changes to disk
+    echo d # delete a partition
+    echo 5 # partition number   => 5
+    echo d # delete a partition
+    echo 6 # partition number   => 6
+    echo w # write changes to disk
   ) | fdisk ${DEVICE}
 
   lsblk
@@ -102,10 +111,12 @@ function second_stage() {
   apt install -y git
 
   mkdir -p /root/bootstrap
-  ( cd /root/bootstrap
+  (
+    cd /root/bootstrap
     git clone --depth 1 https://github.com/linux-surface/linux-surface linux-surface/
 
-    ( cd linux-surface/
+    (
+      cd linux-surface/
 
       echo "copying root files from linux-surface"
       for dir in $(ls root/); do
@@ -125,7 +136,8 @@ function second_stage() {
     echo "cloning kernel configs"
     git clone https://github.com/linux-surface/kernel-configs kernel-configs/
 
-    ( cd linux-kernel/
+    (
+      cd linux-kernel/
 
       echo "checking out desired kernel version to custom branch"
       git checkout ${LINUX_VERSION}
