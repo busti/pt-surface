@@ -14,14 +14,17 @@ function first_stage() {
   echo -n "luks password: "
   read -s luks_password_in
   export LUKS_PASSWORD=$luks_password_in
+  echo
 
   echo -n "root password: "
   read -s root_password_in
   export ROOT_PASSWORD=$root_password_in
+  echo
 
   echo -n "user password: "
   read -s user_password_in
   export USER_PASSWORD=$user_password_in
+  echo
 
   echo "installing tool required for disk formatting"
   apt install -y cryptsetup btrfs-progs lvm2
