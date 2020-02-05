@@ -8,20 +8,20 @@ LINUX_VERSION_MAJOR="4.19"
 LINUX_VERSION_MINOR="98"
 LINUX_VERSION="v${LINUX_VERSION_MAJOR}.${LINUX_VERSION_MINOR}"
 
-echo -n "luks password: "
-read -s luks_password_in
-export LUKS_PASSWORD=$luks_password_in
-
-echo -n "root password: "
-read -s root_password_in
-export ROOT_PASSWORD=$root_password_in
-
-echo -n "user password: "
-read -s user_password_in
-export USER_PASSWORD=$user_password_in
-
 function first_stage() {
   set -e
+
+  echo -n "luks password: "
+  read -s luks_password_in
+  export LUKS_PASSWORD=$luks_password_in
+
+  echo -n "root password: "
+  read -s root_password_in
+  export ROOT_PASSWORD=$root_password_in
+
+  echo -n "user password: "
+  read -s user_password_in
+  export USER_PASSWORD=$user_password_in
 
   echo "installing tool required for disk formatting"
   apt install -y cryptsetup btrfs-progs lvm2
@@ -155,5 +155,43 @@ function second_stage() {
 
     echo "installing kernel"
     dpkg -i linux*.deb
+
+    git clone https://github.com/linux-surface/libwacom-surface-deb
+    (
+      cd libwacom-surface-deb/
+      apt install debhelper dh-autoreconf fakeroot libglib2.0-dev libgtk2.0-dev libgudev-1.0-dev librsvg2-dev libxml2-dev
+      ./makedeb
+      dpkg -i ./*.deb
+    )
   )
+
+  (
+    echo $ROOT_PASSWORD
+    echo $ROOT_PASSWORD
+  ) | passwd
+
+  apt install -y grub-efi-amd64 cryptsetup btrfs-progs lvm2 locales tzdata keyboard-configuration console-common zsh
+
+  mkdir /snap
+  btrfs subvolume snapshot / /snap/$(date +%Y-%m-%d_basesystem)
+
+  (
+    echo $USER_PASSWORD
+    echo $USER_PASSWORD
+    echo
+    echo
+    echo
+    echo
+    echo
+  ) | adduser mbust
+
+  HOME=/home/mbust
+
+  btrfs subvolume snapshot / /snap/$(date +%Y-%m-%d_user_gui)
+
+  git clone git://github.com/robbyrussell/oh-my-zsh.git $HOME/.oh-my-zsh
+
+  chmod 0755 $HOME/.oh-my-zsh
+
+  chown -R busti:busti $HOME
 }
